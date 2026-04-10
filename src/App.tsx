@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "./App.css";
 
 import { AddCardForm } from "./features/cards/AddCardForm";
@@ -28,19 +27,6 @@ export default function App() {
     confirmDone,
     cleanupClosing,
   } = useClosing({ cards, setCards });
-  const [title, setTitle] = useState("");
-  const [hypothesis, setHypothesis] = useState("");
-  const [success, setSuccess] = useState("");
-
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const ok = addCard({ title, hypothesis, success });
-    if (!ok) return;
-
-    setTitle("");
-    setHypothesis("");
-    setSuccess("");
-  }
 
   function onDeleteCard(id: string) {
     deleteCard(id);
@@ -51,15 +37,7 @@ export default function App() {
     <div style={{ padding: 16, maxWidth: 1100, margin: "0 auto" }}>
       <h1>タイトル</h1>
 
-      <AddCardForm
-        title={title}
-        hypothesis={hypothesis}
-        success={success}
-        setTitle={setTitle}
-        setHypothesis={setHypothesis}
-        setSuccess={setSuccess}
-        onSubmit={onSubmit}
-      />
+      <AddCardForm onAddCard={addCard} />
 
       <hr />
 
