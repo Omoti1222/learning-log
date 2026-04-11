@@ -67,8 +67,7 @@ export function useCardsStorage(storageKey: string) {
     const s = input.success.trim();
 
     if (!t || !h || !s) {
-      alert("タイトル・仮説・成功条件は必須です");
-      return false;
+      return { ok: false as const, error: "タイトル・仮説・成功条件は必須です" };
     }
 
     const newCard: CardType = {
@@ -82,7 +81,7 @@ export function useCardsStorage(storageKey: string) {
     };
 
     setCards((prev) => [newCard, ...prev]);
-    return true;
+    return { ok: true as const };
   }
 
   function deleteCard(id: string) {

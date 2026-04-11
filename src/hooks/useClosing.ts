@@ -11,7 +11,6 @@ const emptyDraft: ClosingDraft = { result: "", learning: "" };
 export function useClosing(args: {
   cards: CardType[];
   setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
-  onDeleteCardCleanup?: (id: string) => void;
 }) {
   const { cards, setCards } = args;
 

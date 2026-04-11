@@ -2,20 +2,26 @@ import { useState } from "react";
 
 type Input = {title: string; hypothesis: string; success: string};
 
+type AddCardResult = { ok: true } | { ok: false; error: string };
+
 type Props = {
-  onAddCard: (input: Input) => boolean;
+  onAddCard: (input: Input) => AddCardResult;
 };
 
 export function AddCardForm({onAddCard}: Props) {
   const [title, setTitle] = useState("");
   const [hypothesis, setHypothesis] = useState("");
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const ok = onAddCard({title, hypothesis, success});
-    if (!ok) return;
-
+    const result = onAddCard({title, hypothesis, success});
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setError("");
     setTitle("");
     setHypothesis("");
     setSuccess("");
@@ -42,6 +48,7 @@ export function AddCardForm({onAddCard}: Props) {
         placeholder="成功条件"
         />
       <button type="submit">追加</button>
+      {error && <p style={{ color: "red", margin: 0 }}>{error}</p>}
     </form>
   );
 }
