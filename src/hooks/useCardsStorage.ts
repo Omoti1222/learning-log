@@ -59,15 +59,15 @@ export function useCardsStorage(storageKey: string) {
   // actions
   function addCard(input: {
     title: string;
-    hypothesis: string;
-    success: string;
+    hypothesis?: string;
+    success?: string;
   }) {
     const t = input.title.trim();
-    const h = input.hypothesis.trim();
-    const s = input.success.trim();
+    const h = (input.hypothesis ?? "").trim();
+    const s = (input.success ?? "").trim();
 
-    if (!t || !h || !s) {
-      return { ok: false as const, error: "タイトル・仮説・成功条件は必須です" };
+    if (!t) {
+      return { ok: false as const, error: "タイトルは必須です" };
     }
 
     const newCard: CardType = {

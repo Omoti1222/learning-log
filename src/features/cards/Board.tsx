@@ -36,7 +36,7 @@ export function Board(props: Props) {
     <div
       style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr 1fr" }}
     >
-      <Column title="Planned" items={planned}>
+      <Column title="予定" items={planned}>
         {(c) => (
           <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
             <button type="button" onClick={() => onSetStatus(c.id, "doing")}>
@@ -46,7 +46,7 @@ export function Board(props: Props) {
         )}
       </Column>
 
-      <Column title="Doing" items={doing}>
+      <Column title="進行中" items={doing}>
         {(c) => {
           const draft = closing[c.id];
           const isClosing = Boolean(draft);
@@ -103,7 +103,7 @@ export function Board(props: Props) {
         }}
       </Column>
 
-      <Column title="Done (見返し)" items={done}>
+      <Column title="完了" items={done}>
         {(c) => (
           <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
             <div style={{ marginTop: 8 }}>
