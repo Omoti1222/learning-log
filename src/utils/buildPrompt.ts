@@ -1,4 +1,4 @@
-import type { CardType } from "../types";
+import type { CardType, HandoverCard } from "../types";
 
 export function buildPrompt(card: CardType): string {
   if (card.status === "planned" || card.status === "doing") {
@@ -27,5 +27,22 @@ ${card.learning ? `\n## 得た学び\n${card.learning}` : ""}
 
 ## 質問
 この結果と学びをもとに、次に活かせるアクションを提案してください。
+  `.trim();
+}
+
+export function buildHandoverPrompt(card: HandoverCard): string {
+  return `
+# 以下の業務内容を、誰でも分かる引き継ぎ書として整えてください
+
+## 業務名
+${card.title}
+${card.steps ? `\n## 手順\n${card.steps}` : ""}
+${card.notes ? `\n## 注意事項\n${card.notes}` : ""}
+${card.links ? `\n## 関連URL・ファイル\n${card.links}` : ""}
+
+## 出力してほしいもの
+- 読みやすく整理された手順（番号付きリスト）
+- 注意事項をわかりやすく補足
+- 初めてこの業務をする人が迷わないような説明
   `.trim();
 }

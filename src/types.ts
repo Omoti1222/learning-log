@@ -8,6 +8,8 @@ export type CardType = {
   status: Status;
   result: string;
   learning: string;
+  createdAt: string;    // 作成日時（ISO文字列）
+  completedAt?: string; // 完了日時（Done確定時にセット）
 };
 
 export type ClosingDraft = {
@@ -17,3 +19,11 @@ export type ClosingDraft = {
 
 export type ClosingMap = Record<string, ClosingDraft>;
 export type ClosingPatch = Partial<ClosingDraft>;
+
+export type HandoverCard = {
+  id: string;
+  title: string;  // 業務名
+  steps: string;  // 手順
+  notes: string;  // 注意事項
+  links: string;  // 関連URL・ファイルパス
+};

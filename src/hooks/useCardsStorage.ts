@@ -18,6 +18,8 @@ function normalizeCards(saved: unknown): CardType[] {
       status,
       result: typeof x?.result === "string" ? x.result : "",
       learning: typeof x?.learning === "string" ? x.learning : "",
+      createdAt: typeof x?.createdAt === "string" ? x.createdAt : new Date().toISOString(),
+      completedAt: typeof x?.completedAt === "string" ? x.completedAt : undefined,
     };
   });
 }
@@ -78,6 +80,7 @@ export function useCardsStorage(storageKey: string) {
       status: "planned",
       result: "",
       learning: "",
+      createdAt: new Date().toISOString(),
     };
 
     setCards((prev) => [newCard, ...prev]);

@@ -53,7 +53,9 @@ export function useClosing(args: {
 
     setCards((prev) =>
       prev.map((c) =>
-        c.id === id ? { ...c, status: "done", result, learning } : c,
+        c.id === id
+          ? { ...c, status: "done", result, learning, completedAt: new Date().toISOString() }
+          : c,
       ),
     );
 
