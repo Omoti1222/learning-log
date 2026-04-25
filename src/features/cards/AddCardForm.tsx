@@ -31,23 +31,24 @@ export function AddCardForm({ onAddCard }: Props) {
     setSuccess("");
   }
 
+  const tabBase = "px-3 py-1 text-sm rounded border cursor-pointer";
+  const tabActive = "border-blue-500 text-blue-600 font-bold bg-white";
+  const tabInactive = "border-gray-300 text-gray-500 bg-white hover:bg-gray-50";
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{ display: "grid", gap: 8, maxWidth: 900 }}
-    >
-      <div style={{ display: "flex", gap: 8 }}>
+    <form onSubmit={handleSubmit} className="grid gap-2 max-w-[900px]">
+      <div className="flex gap-2">
         <button
           type="button"
           onClick={() => setMode("simple")}
-          style={{ fontWeight: mode === "simple" ? "bold" : "normal" }}
+          className={`${tabBase} ${mode === "simple" ? tabActive : tabInactive}`}
         >
           やること
         </button>
         <button
           type="button"
           onClick={() => setMode("detail")}
-          style={{ fontWeight: mode === "detail" ? "bold" : "normal" }}
+          className={`${tabBase} ${mode === "detail" ? tabActive : tabInactive}`}
         >
           試してみる
         </button>
@@ -57,6 +58,7 @@ export function AddCardForm({ onAddCard }: Props) {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="タイトル"
+        className="border border-gray-300 rounded px-3 py-2 text-sm w-full"
       />
 
       {mode === "detail" && (
@@ -65,17 +67,24 @@ export function AddCardForm({ onAddCard }: Props) {
             value={hypothesis}
             onChange={(e) => setHypothesis(e.target.value)}
             placeholder="仮説（〇〇すれば△△になるはず）"
+            className="border border-gray-300 rounded px-3 py-2 text-sm w-full"
           />
           <input
             value={success}
             onChange={(e) => setSuccess(e.target.value)}
             placeholder="成功条件（具体的・測定可能な形で）"
+            className="border border-gray-300 rounded px-3 py-2 text-sm w-full"
           />
         </>
       )}
 
-      <button type="submit">追加</button>
-      {error && <p style={{ color: "red", margin: 0 }}>{error}</p>}
+      <button
+        type="submit"
+        className="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 cursor-pointer w-fit"
+      >
+        追加
+      </button>
+      {error && <p className="text-red-500 text-sm m-0">{error}</p>}
     </form>
   );
 }

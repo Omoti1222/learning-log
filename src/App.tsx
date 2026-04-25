@@ -48,22 +48,29 @@ export default function App() {
     cleanupClosing(id);
   }
 
-  return (
-    <div style={{ padding: 16, maxWidth: 1400, margin: "0 auto", display: "flex", gap: 16, alignItems: "flex-start" }}>
+  const tabBase =
+    "px-4 py-1.5 text-sm rounded border cursor-pointer";
+  const tabActive =
+    "border-blue-500 text-blue-600 font-bold bg-white";
+  const tabInactive =
+    "border-gray-300 text-gray-500 bg-white hover:bg-gray-50";
 
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+  return (
+    <div className="p-4 max-w-[1400px] mx-auto flex gap-4 items-start">
+
+      <div className="flex-1 min-w-0">
+        <div className="flex gap-2 mb-4">
           <button
             type="button"
             onClick={() => setTab("log")}
-            style={{ fontWeight: tab === "log" ? "bold" : "normal" }}
+            className={`${tabBase} ${tab === "log" ? tabActive : tabInactive}`}
           >
             行動ログ
           </button>
           <button
             type="button"
             onClick={() => setTab("handover")}
-            style={{ fontWeight: tab === "handover" ? "bold" : "normal" }}
+            className={`${tabBase} ${tab === "handover" ? tabActive : tabInactive}`}
           >
             業務内容
           </button>
@@ -73,7 +80,7 @@ export default function App() {
           <>
             <AddCardForm onAddCard={addCard} />
 
-            <hr />
+            <hr className="my-4 border-gray-200" />
 
             <Board
               planned={planned}
@@ -88,41 +95,51 @@ export default function App() {
               onConfirmDone={confirmDone}
             />
 
-            <hr />
+            <hr className="my-4 border-gray-200" />
 
-            <h2>ログ一覧</h2>
+            <h2 className="font-bold text-base text-gray-700 mb-3">ログ一覧</h2>
             {done.length === 0 ? (
-              <p>まだ完了がありません</p>
+              <p className="text-gray-500 text-sm">まだ完了がありません</p>
             ) : (
               (() => {
-                // 完了日でグループ化
                 const groups: Record<string, typeof done> = {};
                 done.forEach((c) => {
                   const date = c.completedAt
-                    ? new Date(c.completedAt).toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" })
+                    ? new Date(c.completedAt).toLocaleDateString("ja-JP", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })
                     : "日付不明";
                   if (!groups[date]) groups[date] = [];
                   groups[date].push(c);
                 });
 
-                // 新しい日付順に並べる
                 return Object.entries(groups)
                   .sort(([a], [b]) => b.localeCompare(a))
                   .map(([date, cards]) => (
-                    <div key={date} style={{ marginBottom: 16 }}>
-                      <div style={{ borderBottom: "1px solid #ccc", marginBottom: 8, paddingBottom: 4, fontWeight: "bold" }}>
+                    <div key={date} className="mb-4">
+                      <div className="border-b border-gray-300 mb-2 pb-1 font-bold text-sm text-gray-600">
                         {date}
                       </div>
-                      <ul style={{ paddingLeft: 18, margin: 0 }}>
+                      <ul className="pl-[18px] m-0 grid gap-1">
                         {cards.map((c) => (
-                          <li key={c.id}>
-                            <span style={{ color: "#888", fontSize: 12, marginRight: 8 }}>
+                          <li key={c.id} className="text-sm">
+                            <span className="text-gray-400 text-xs mr-2">
                               {c.completedAt
-                                ? new Date(c.completedAt).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })
+                                ? new Date(c.completedAt).toLocaleTimeString(
+                                    "ja-JP",
+                                    { hour: "2-digit", minute: "2-digit" },
+                                  )
                                 : ""}
                             </span>
                             <strong>{c.learning || c.title}</strong>
-                            {c.learning && <span style={{ color: "#888" }}> ({c.title})</span>}
+                            {c.learning && (
+                              <span className="text-gray-500 text-xs">
+                                {" "}
+                                ({c.title})
+                              </span>
+                            )}
                           </li>
                         ))}
                       </ul>
@@ -135,15 +152,15 @@ export default function App() {
 
         {tab === "handover" && (
           <>
-            <h2>業務内容</h2>
+            <h2 className="font-bold text-base text-gray-700 mb-3">業務内容</h2>
             <HandoverForm onAddCard={addHandoverCard} />
-            <hr />
+            <hr className="my-4 border-gray-200" />
             <HandoverList cards={handoverCards} onDelete={deleteHandoverCard} />
           </>
         )}
       </div>
 
-      <div style={{ width: 280, flexShrink: 0 }}>
+      <div className="w-[280px] shrink-0">
         <GlobalMemo />
       </div>
 

@@ -7,7 +7,13 @@ type Props = {
   onDelete: (id: string) => void;
 };
 
-function HandoverItem({ card, onDelete }: { card: HandoverCard; onDelete: () => void }) {
+function HandoverItem({
+  card,
+  onDelete,
+}: {
+  card: HandoverCard;
+  onDelete: () => void;
+}) {
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
@@ -19,28 +25,40 @@ function HandoverItem({ card, onDelete }: { card: HandoverCard; onDelete: () => 
   }
 
   return (
-    <article style={{ border: "1px solid #ccc", padding: 12 }}>
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <strong style={{ flex: 1 }}>{card.title}</strong>
-        <button type="button" onClick={handleCopy}>
+    <article className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+      <div className="flex gap-2 items-center">
+        <strong className="flex-1 text-sm">{card.title}</strong>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="text-xs px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer"
+        >
           {copied ? "コピー済み✓" : "AIに整える"}
         </button>
-        <button type="button" onClick={onDelete}>削除</button>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="text-xs px-2 py-1 border border-red-200 text-red-500 rounded hover:bg-red-50 cursor-pointer"
+        >
+          削除
+        </button>
       </div>
 
       {card.steps && (
-        <div style={{ marginTop: 8 }}>
-          <strong>手順：</strong>
-          <pre style={{ margin: "4px 0", whiteSpace: "pre-wrap" }}>{card.steps}</pre>
+        <div className="mt-2">
+          <strong className="text-xs text-gray-600">手順：</strong>
+          <pre className="my-1 whitespace-pre-wrap text-xs text-gray-700">
+            {card.steps}
+          </pre>
         </div>
       )}
       {card.notes && (
-        <div style={{ marginTop: 4 }}>
+        <div className="mt-1 text-xs text-gray-600">
           <strong>注意事項：</strong> {card.notes}
         </div>
       )}
       {card.links && (
-        <div style={{ marginTop: 4 }}>
+        <div className="mt-1 text-xs text-gray-600">
           <strong>関連：</strong> {card.links}
         </div>
       )}
@@ -50,13 +68,17 @@ function HandoverItem({ card, onDelete }: { card: HandoverCard; onDelete: () => 
 
 export function HandoverList({ cards, onDelete }: Props) {
   if (cards.length === 0) {
-    return <p>業務内容がまだありません</p>;
+    return <p className="text-gray-500 text-sm">業務内容がまだありません</p>;
   }
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
+    <div className="grid gap-3">
       {cards.map((card) => (
-        <HandoverItem key={card.id} card={card} onDelete={() => onDelete(card.id)} />
+        <HandoverItem
+          key={card.id}
+          card={card}
+          onDelete={() => onDelete(card.id)}
+        />
       ))}
     </div>
   );
