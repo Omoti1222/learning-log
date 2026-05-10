@@ -3,28 +3,25 @@ import type { HandoverCard } from "../types";
 
 const HANDOVER_KEY = "action_log_handover_v1";
 
-export function useHandoverStorage() {
-  const [cards, setCards] = useState<HandoverCard[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+function loadHandoverCards(): HandoverCard[] {
+  const raw = localStorage.getItem(HANDOVER_KEY);
+  if (!raw) return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed as HandoverCard[];
+    return [];
+  } catch {
+    return [];
+  }
+}
 
-  // 起動時に読み込む
-  useEffect(() => {
-    const raw = localStorage.getItem(HANDOVER_KEY);
-    if (raw) {
-      try {
-        setCards(JSON.parse(raw));
-      } catch {
-        // ignore
-      }
-    }
-    setHydrated(true);
-  }, []);
+export function useHandoverStorage() {
+  const [cards, setCards] = useState<HandoverCard[]>(loadHandoverCards);
 
   // 変更のたびに保存
   useEffect(() => {
-    if (!hydrated) return;
     localStorage.setItem(HANDOVER_KEY, JSON.stringify(cards));
-  }, [cards, hydrated]);
+  }, [cards]);
 
   function addCard(input: Omit<HandoverCard, "id">) {
     if (!input.title.trim()) {

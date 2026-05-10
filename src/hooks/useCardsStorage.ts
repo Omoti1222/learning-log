@@ -1,53 +1,63 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CardType, Status } from "../types";
 
+function prop(obj: unknown, key: string): unknown {
+  if (typeof obj === "object" && obj !== null) {
+    return (obj as Record<string, unknown>)[key];
+  }
+  return undefined;
+}
+
 function normalizeCards(saved: unknown): CardType[] {
   if (!Array.isArray(saved)) return [];
 
-  return saved.map((x: any) => {
+  return saved.map((x: unknown) => {
+    const s = prop(x, "status");
     const status: Status =
-      x?.status === "planned" || x?.status === "doing" || x?.status === "done"
-        ? x.status
-        : "planned";
+      s === "planned" || s === "doing" || s === "done" ? s : "planned";
+
+    const id = prop(x, "id");
+    const title = prop(x, "title");
+    const hypothesis = prop(x, "hypothesis");
+    const success = prop(x, "success");
+    const result = prop(x, "result");
+    const learning = prop(x, "learning");
+    const createdAt = prop(x, "createdAt");
+    const completedAt = prop(x, "completedAt");
 
     return {
-      id: typeof x?.id === "string" ? x.id : crypto.randomUUID(),
-      title: typeof x?.title === "string" ? x.title : "",
-      hypothesis: typeof x?.hypothesis === "string" ? x.hypothesis : "",
-      success: typeof x?.success === "string" ? x.success : "",
+      id: typeof id === "string" ? id : crypto.randomUUID(),
+      title: typeof title === "string" ? title : "",
+      hypothesis: typeof hypothesis === "string" ? hypothesis : "",
+      success: typeof success === "string" ? success : "",
       status,
-      result: typeof x?.result === "string" ? x.result : "",
-      learning: typeof x?.learning === "string" ? x.learning : "",
-      createdAt: typeof x?.createdAt === "string" ? x.createdAt : new Date().toISOString(),
-      completedAt: typeof x?.completedAt === "string" ? x.completedAt : undefined,
+      result: typeof result === "string" ? result : "",
+      learning: typeof learning === "string" ? learning : "",
+      createdAt: typeof createdAt === "string" ? createdAt : new Date().toISOString(),
+      completedAt: typeof completedAt === "string" ? completedAt : undefined,
     };
   });
 }
 
+function loadCards(storageKey: string): CardType[] {
+  const raw = localStorage.getItem(storageKey);
+  if (!raw) return [];
+  try {
+    return normalizeCards(JSON.parse(raw));
+  } catch {
+    return [];
+  }
+}
+
 export function useCardsStorage(storageKey: string) {
-  const [cards, setCards] = useState<CardType[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [cards, setCards] = useState<CardType[]>(() => loadCards(storageKey));
 
-  //load once
+  // 変更のたびに保存
   useEffect(() => {
-    const raw = localStorage.getItem(storageKey);
-    if (raw) {
-      try {
-        setCards(normalizeCards(JSON.parse(raw)));
-      } catch {
-        // ignore
-      }
-    }
-    setHydrated(true);
-  }, [storageKey]);
-
-  //save after hydration
-  useEffect(() => {
-    if (!hydrated) return;
     localStorage.setItem(storageKey, JSON.stringify(cards));
-  }, [cards, hydrated, storageKey]);
+  }, [cards, storageKey]);
 
-  //derived lists
+  // derived lists
   const planned = useMemo(
     () => cards.filter((c) => c.status === "planned"),
     [cards],
