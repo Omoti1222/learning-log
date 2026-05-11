@@ -59,18 +59,29 @@ export function Board(props: Props) {
         {(c) => {
           const draft = closing[c.id];
           const isClosing = Boolean(draft);
+          const isSimple = !c.hypothesis;
 
           return (
             <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
               {!isClosing ? (
                 <div className="flex gap-1 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() => onStartClosing(c.id)}
-                    className={btnPrimary}
-                  >
-                    完了入力
-                  </button>
+                  {isSimple ? (
+                    <button
+                      type="button"
+                      onClick={() => onSetStatus(c.id, "done")}
+                      className={btnPrimary}
+                    >
+                      完了
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => onStartClosing(c.id)}
+                      className={btnPrimary}
+                    >
+                      完了入力
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => onSetStatus(c.id, "planned")}
