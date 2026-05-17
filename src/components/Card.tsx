@@ -29,15 +29,17 @@ export function Card(props: Props) {
           type="button"
           onClick={handleCopy}
           className="text-xs px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer"
+          title="AIへのプロンプトをコピー"
         >
-          {copied ? "コピー済み✓" : "AIに聞く"}
+          {copied ? "✓" : "AI"}
         </button>
         <button
           type="button"
           onClick={onDelete}
           className="text-xs px-2 py-1 border border-red-200 text-red-500 rounded hover:bg-red-50 cursor-pointer"
+          title="削除"
         >
-          削除
+          ×
         </button>
       </div>
 

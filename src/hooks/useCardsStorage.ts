@@ -102,7 +102,13 @@ export function useCardsStorage(storageKey: string) {
   }
 
   function setStatus(id: string, status: Status) {
-    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)));
+    setCards((prev) =>
+      prev.map((c) =>
+        c.id === id
+          ? { ...c, status, completedAt: status === "done" ? new Date().toISOString() : c.completedAt }
+          : c,
+      ),
+    );
   }
 
   return {

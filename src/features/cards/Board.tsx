@@ -134,14 +134,12 @@ export function Board(props: Props) {
       <Column title="完了" items={done}>
         {(c) => (
           <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
-            <div className="mt-2 text-xs text-gray-600 grid gap-0.5">
-              <div>
-                <strong>結果:</strong> {c.result}
+            {c.result || c.learning ? (
+              <div className="mt-2 text-xs text-gray-600 grid gap-0.5">
+                {c.result && <div><strong>結果:</strong> {c.result}</div>}
+                {c.learning && <div><strong>学び:</strong> {c.learning}</div>}
               </div>
-              <div>
-                <strong>学び:</strong> {c.learning}
-              </div>
-            </div>
+            ) : null}
             <button
               type="button"
               onClick={() => onSetStatus(c.id, "doing")}
