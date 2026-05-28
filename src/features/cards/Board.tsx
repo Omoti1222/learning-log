@@ -19,11 +19,110 @@ type Props = {
 };
 
 const btnBase =
-  "text-xs px-2 py-1 border rounded cursor-pointer";
+  "text-xs px-2.5 py-1 border rounded cursor-pointer transition-colors";
 const btnDefault =
-  `${btnBase} border-gray-300 bg-white hover:bg-gray-100`;
+  `${btnBase} border-slate-200 bg-white text-slate-500 hover:bg-slate-50`;
 const btnPrimary =
-  `${btnBase} border-blue-500 bg-blue-500 text-white hover:bg-blue-600`;
+  `${btnBase} border-slate-700 bg-slate-700 text-white hover:bg-slate-800`;
+
+function DoingCard({
+  c,
+  closing,
+  onDeleteCard,
+  onSetStatus,
+  onStartClosing,
+  onUpdateClosing,
+  onCancelClosing,
+  onConfirmDone,
+}: {
+  c: CardType;
+  closing: ClosingMap;
+  onDeleteCard: (id: string) => void;
+  onSetStatus: (id: string, status: Status) => void;
+  onStartClosing: (id: string) => void;
+  onUpdateClosing: (id: string, patch: ClosingPatch) => void;
+  onCancelClosing: (id: string) => void;
+  onConfirmDone: (id: string) => void;
+}) {
+  const draft = closing[c.id];
+  const isClosing = Boolean(draft);
+  const isSimple = !c.hypothesis;
+
+  return (
+    <div className="border-l-4 border-l-amber-400 rounded-lg">
+      <Card c={c} onDelete={() => onDeleteCard(c.id)}>
+        <div className="flex items-center gap-1 mb-1.5">
+          <span className="text-[10px] bg-amber-100 text-amber-600 rounded px-1.5 py-0.5 font-medium">
+            進行中
+          </span>
+        </div>
+        {!isClosing ? (
+          <div className="flex gap-1 flex-wrap">
+            {isSimple ? (
+              <button
+                type="button"
+                onClick={() => onSetStatus(c.id, "done")}
+                className={btnPrimary}
+              >
+                完了
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onStartClosing(c.id)}
+                className={btnPrimary}
+              >
+                完了入力
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => onSetStatus(c.id, "planned")}
+              className={btnDefault}
+            >
+              予定に戻る
+            </button>
+          </div>
+        ) : (
+          <div className="grid gap-2 w-full mt-2">
+            <textarea
+              value={draft.result}
+              onChange={(e) =>
+                onUpdateClosing(c.id, { result: e.currentTarget.value })
+              }
+              placeholder="結果"
+              className="border border-slate-200 rounded px-2 py-1 text-xs w-full resize-y"
+            />
+            <textarea
+              value={draft.learning}
+              onChange={(e) =>
+                onUpdateClosing(c.id, { learning: e.currentTarget.value })
+              }
+              placeholder="学び(原因)"
+              className="border border-slate-200 rounded px-2 py-1 text-xs w-full resize-y"
+            />
+            <div className="flex gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={() => onConfirmDone(c.id)}
+                className={btnPrimary}
+              >
+                完了確定
+              </button>
+              <button
+                type="button"
+                onClick={() => onCancelClosing(c.id)}
+                className={btnDefault}
+              >
+                キャンセル
+              </button>
+            </div>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
 
 export function Board(props: Props) {
   const {
@@ -39,117 +138,84 @@ export function Board(props: Props) {
     onConfirmDone,
   } = props;
 
+  const total = doing.length + planned.length;
+
   return (
-    <div className="grid gap-3 grid-cols-3">
-      <Column title="予定" items={planned}>
-        {(c) => (
-          <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
-            <button
-              type="button"
-              onClick={() => onSetStatus(c.id, "doing")}
-              className={btnDefault}
-            >
-              進行中へ
-            </button>
-          </Card>
-        )}
-      </Column>
+    <div className="grid gap-3 grid-cols-2">
 
-      <Column title="進行中" items={doing}>
-        {(c) => {
-          const draft = closing[c.id];
-          const isClosing = Boolean(draft);
-          const isSimple = !c.hypothesis;
+      {/* やること列 */}
+      <section className="border border-slate-200 rounded-lg p-3 bg-slate-50/60">
+        <h2 className="font-semibold text-xs text-slate-500 tracking-wide uppercase mb-3 m-0">
+          やること <span className="font-normal">({total})</span>
+        </h2>
 
-          return (
-            <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
-              {!isClosing ? (
-                <div className="flex gap-1 flex-wrap">
-                  {isSimple ? (
-                    <button
-                      type="button"
-                      onClick={() => onSetStatus(c.id, "done")}
-                      className={btnPrimary}
-                    >
-                      完了
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => onStartClosing(c.id)}
-                      className={btnPrimary}
-                    >
-                      完了入力
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => onSetStatus(c.id, "planned")}
-                    className={btnDefault}
-                  >
-                    予定に戻る
-                  </button>
-                </div>
-              ) : (
-                <div className="grid gap-2 w-full mt-2">
-                  <textarea
-                    value={draft.result}
-                    onChange={(e) =>
-                      onUpdateClosing(c.id, { result: e.currentTarget.value })
-                    }
-                    placeholder="結果"
-                    className="border border-gray-300 rounded px-2 py-1 text-xs w-full resize-y"
-                  />
-                  <textarea
-                    value={draft.learning}
-                    onChange={(e) =>
-                      onUpdateClosing(c.id, { learning: e.currentTarget.value })
-                    }
-                    placeholder="学び(原因)"
-                    className="border border-gray-300 rounded px-2 py-1 text-xs w-full resize-y"
-                  />
-                  <div className="flex gap-2 flex-wrap">
-                    <button
-                      type="button"
-                      onClick={() => onConfirmDone(c.id)}
-                      className={btnPrimary}
-                    >
-                      完了確定
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onCancelClosing(c.id)}
-                      className={btnDefault}
-                    >
-                      キャンセル
-                    </button>
-                  </div>
+        <div className="grid gap-2">
+          {/* 進行中セクション */}
+          {doing.length > 0 && (
+            <>
+              {doing.map((c) => (
+                <DoingCard
+                  key={c.id}
+                  c={c}
+                  closing={closing}
+                  onDeleteCard={onDeleteCard}
+                  onSetStatus={onSetStatus}
+                  onStartClosing={onStartClosing}
+                  onUpdateClosing={onUpdateClosing}
+                  onCancelClosing={onCancelClosing}
+                  onConfirmDone={onConfirmDone}
+                />
+              ))}
+              {planned.length > 0 && (
+                <div className="flex items-center gap-2 my-1">
+                  <div className="flex-1 border-t border-slate-200" />
+                  <span className="text-[10px] text-slate-300">予定</span>
+                  <div className="flex-1 border-t border-slate-200" />
                 </div>
               )}
-            </Card>
-          );
-        }}
-      </Column>
+            </>
+          )}
 
+          {/* 予定セクション */}
+          {planned.length === 0 && doing.length === 0 ? (
+            <div className="text-slate-300 text-sm">なし</div>
+          ) : (
+            planned.map((c) => (
+              <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
+                <button
+                  type="button"
+                  onClick={() => onSetStatus(c.id, "doing")}
+                  className={btnDefault}
+                >
+                  進行中へ
+                </button>
+              </Card>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* 完了列 */}
       <Column title="完了" items={done}>
         {(c) => (
           <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
             {c.result || c.learning ? (
-              <div className="mt-2 text-xs text-gray-600 grid gap-0.5">
+              <div className="mt-2 text-xs text-slate-500 grid gap-0.5">
                 {c.result && <div><strong>結果:</strong> {c.result}</div>}
                 {c.learning && <div><strong>学び:</strong> {c.learning}</div>}
               </div>
             ) : null}
             <button
               type="button"
-              onClick={() => onSetStatus(c.id, "doing")}
+              onClick={() => onSetStatus(c.id, "planned")}
               className={`${btnDefault} mt-1`}
             >
-              進行中に戻す
+              予定に戻す
             </button>
           </Card>
         )}
       </Column>
+
     </div>
   );
 }

@@ -11,13 +11,13 @@ export function Column(props: Props) {
   const { title, items, children } = props;
 
   return (
-    <section className="border border-gray-200 rounded-lg p-3 bg-gray-50">
-      <h2 className="font-bold text-sm text-gray-600 mb-2 m-0">
-        {title} <span className="text-xs font-normal">({items.length})</span>
+    <section className="border border-slate-200 rounded-lg p-3 bg-slate-50/60">
+      <h2 className="font-semibold text-xs text-slate-500 tracking-wide uppercase mb-3 m-0">
+        {title} <span className="font-normal">({items.length})</span>
       </h2>
       <div className="grid gap-2">
         {items.length === 0 ? (
-          <div className="text-gray-400 text-sm">なし</div>
+          <div className="text-slate-300 text-sm">なし</div>
         ) : (
           items.map(children)
         )}

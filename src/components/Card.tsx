@@ -22,13 +22,13 @@ export function Card(props: Props) {
   }
 
   return (
-    <article className="bg-white border border-gray-200 rounded-lg p-2.5 shadow-sm">
+    <article className="bg-white border border-slate-200 rounded-lg p-3 shadow-xs">
       <div className="flex gap-2 items-center">
-        <strong className="flex-1 text-sm">{c.title}</strong>
+        <strong className="flex-1 text-sm text-slate-800">{c.title}</strong>
         <button
           type="button"
           onClick={handleCopy}
-          className="text-xs px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer"
+          className="text-xs px-2 py-0.5 border border-slate-200 text-slate-400 rounded hover:bg-slate-50 cursor-pointer"
           title="AIへのプロンプトをコピー"
         >
           {copied ? "✓" : "AI"}
@@ -36,7 +36,7 @@ export function Card(props: Props) {
         <button
           type="button"
           onClick={onDelete}
-          className="text-xs px-2 py-1 border border-red-200 text-red-500 rounded hover:bg-red-50 cursor-pointer"
+          className="text-xs px-2 py-0.5 border border-slate-200 text-slate-400 rounded hover:bg-red-50 hover:text-red-400 hover:border-red-200 cursor-pointer"
           title="削除"
         >
           ×
@@ -44,10 +44,10 @@ export function Card(props: Props) {
       </div>
 
       {c.hypothesis && (
-        <div className="text-xs text-gray-500 mt-1">仮説: {c.hypothesis}</div>
+        <div className="text-xs text-slate-400 mt-1">仮説: {c.hypothesis}</div>
       )}
       {c.success && (
-        <div className="text-xs text-gray-500 mt-1">成功: {c.success}</div>
+        <div className="text-xs text-slate-400 mt-1">成功条件: {c.success}</div>
       )}
 
       <div className="mt-2">{children}</div>

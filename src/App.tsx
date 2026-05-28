@@ -49,11 +49,11 @@ export default function App() {
   }
 
   const tabBase =
-    "px-4 py-1.5 text-sm rounded border cursor-pointer";
+    "px-4 py-1.5 text-sm rounded border cursor-pointer transition-colors";
   const tabActive =
-    "border-blue-500 text-blue-600 font-bold bg-white";
+    "border-slate-700 text-slate-700 font-semibold bg-white";
   const tabInactive =
-    "border-gray-300 text-gray-500 bg-white hover:bg-gray-50";
+    "border-slate-200 text-slate-400 bg-white hover:bg-slate-50";
 
   return (
     <div className="p-4 max-w-[1400px] mx-auto flex gap-4 items-start">

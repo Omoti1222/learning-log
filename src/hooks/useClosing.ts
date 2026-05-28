@@ -46,11 +46,6 @@ export function useClosing(args: {
     const result = (draft?.result ?? "").trim();
     const learning = (draft?.learning ?? "").trim();
 
-    if (!result || !learning) {
-      alert("結果・学びは必須です");
-      return;
-    }
-
     setCards((prev) =>
       prev.map((c) =>
         c.id === id
