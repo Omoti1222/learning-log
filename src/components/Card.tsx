@@ -1,7 +1,5 @@
-import { useState } from "react";
 import type { ReactNode } from "react";
 import type { CardType } from "../types";
-import { buildPrompt } from "../utils/buildPrompt";
 
 type Props = {
   c: CardType;
@@ -11,28 +9,11 @@ type Props = {
 
 export function Card(props: Props) {
   const { c, onDelete, children } = props;
-  const [copied, setCopied] = useState(false);
-
-  function handleCopy() {
-    const prompt = buildPrompt(c);
-    navigator.clipboard.writeText(prompt).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }
 
   return (
     <article className="bg-white border border-slate-200 rounded-lg p-3 shadow-xs">
       <div className="flex gap-2 items-center">
         <strong className="flex-1 text-sm text-slate-800">{c.title}</strong>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="text-xs px-2 py-0.5 border border-slate-200 text-slate-400 rounded hover:bg-slate-50 cursor-pointer"
-          title="AIへのプロンプトをコピー"
-        >
-          {copied ? "✓" : "AI"}
-        </button>
         <button
           type="button"
           onClick={onDelete}

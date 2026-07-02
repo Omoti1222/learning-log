@@ -8,6 +8,7 @@ export type CardType = {
   status: Status;
   result: string;
   learning: string;
+  comment: string;      // 完了時の感想・コメント（任意）
   createdAt: string;    // 作成日時（ISO文字列）
   completedAt?: string; // 完了日時（Done確定時にセット）
 };
@@ -15,6 +16,7 @@ export type CardType = {
 export type ClosingDraft = {
   result: string;
   learning: string;
+  comment: string;
 };
 
 export type ClosingMap = Record<string, ClosingDraft>;

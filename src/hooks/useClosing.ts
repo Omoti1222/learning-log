@@ -6,7 +6,11 @@ import type {
   ClosingPatch,
 } from "../types";
 
-const emptyDraft: ClosingDraft = { result: "", learning: "" };
+const emptyDraft: ClosingDraft = {
+  result: "",
+  learning: "",
+  comment: "",
+};
 
 export function useClosing(args: {
   cards: CardType[];
@@ -22,7 +26,11 @@ export function useClosing(args: {
 
     setClosing((prev) => ({
       ...prev,
-      [id]: { result: card.result || "", learning: card.learning || "" },
+      [id]: {
+        result: card.result || "",
+        learning: card.learning || "",
+        comment: card.comment || "",
+      },
     }));
   }
 
@@ -45,11 +53,19 @@ export function useClosing(args: {
     const draft = closing[id];
     const result = (draft?.result ?? "").trim();
     const learning = (draft?.learning ?? "").trim();
+    const comment = (draft?.comment ?? "").trim();
 
     setCards((prev) =>
       prev.map((c) =>
         c.id === id
-          ? { ...c, status: "done", result, learning, completedAt: new Date().toISOString() }
+          ? {
+              ...c,
+              status: "done",
+              result,
+              learning,
+              comment,
+              completedAt: new Date().toISOString(),
+            }
           : c,
       ),
     );

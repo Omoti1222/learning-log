@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Column } from "../../components/Column";
 import { Card } from "../../components/Card";
+import { generateDraft } from "../../utils/generateDraft";
 import type { CardType, ClosingMap, ClosingPatch, Status } from "../../types";
 
 type Props = {
@@ -47,6 +49,22 @@ function DoingCard({
   const draft = closing[c.id];
   const isClosing = Boolean(draft);
   const isSimple = !c.hypothesis;
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState("");
+
+  async function handleGenerateDraft() {
+    if (!c.hypothesis) return;
+    setIsGenerating(true);
+    setGenerateError("");
+    try {
+      const result = await generateDraft(c.title, c.hypothesis, c.success);
+      onUpdateClosing(c.id, { result: result.result, learning: result.learning });
+    } catch (e) {
+      setGenerateError(e instanceof Error ? e.message : "エラーが発生しました");
+    } finally {
+      setIsGenerating(false);
+    }
+  }
 
   return (
     <div className="border-l-4 border-l-amber-400 rounded-lg">
@@ -58,23 +76,13 @@ function DoingCard({
         </div>
         {!isClosing ? (
           <div className="flex gap-1 flex-wrap">
-            {isSimple ? (
-              <button
-                type="button"
-                onClick={() => onSetStatus(c.id, "done")}
-                className={btnPrimary}
-              >
-                完了
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => onStartClosing(c.id)}
-                className={btnPrimary}
-              >
-                完了入力
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => onStartClosing(c.id)}
+              className={btnPrimary}
+            >
+              {isSimple ? "完了" : "完了入力"}
+            </button>
             <button
               type="button"
               onClick={() => onSetStatus(c.id, "planned")}
@@ -85,20 +93,45 @@ function DoingCard({
           </div>
         ) : (
           <div className="grid gap-2 w-full mt-2">
+            {!isSimple && (
+              <>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleGenerateDraft}
+                    disabled={isGenerating}
+                    className={`${btnDefault} disabled:opacity-50`}
+                  >
+                    {isGenerating ? "生成中..." : "AI下書き"}
+                  </button>
+                  {generateError && (
+                    <span className="text-xs text-red-400">{generateError}</span>
+                  )}
+                </div>
+                <textarea
+                  value={draft.result}
+                  onChange={(e) =>
+                    onUpdateClosing(c.id, { result: e.currentTarget.value })
+                  }
+                  placeholder="結果"
+                  className="border border-slate-200 rounded px-2 py-1 text-xs w-full resize-y"
+                />
+                <textarea
+                  value={draft.learning}
+                  onChange={(e) =>
+                    onUpdateClosing(c.id, { learning: e.currentTarget.value })
+                  }
+                  placeholder="学び(原因)"
+                  className="border border-slate-200 rounded px-2 py-1 text-xs w-full resize-y"
+                />
+              </>
+            )}
             <textarea
-              value={draft.result}
+              value={draft.comment}
               onChange={(e) =>
-                onUpdateClosing(c.id, { result: e.currentTarget.value })
+                onUpdateClosing(c.id, { comment: e.currentTarget.value })
               }
-              placeholder="結果"
-              className="border border-slate-200 rounded px-2 py-1 text-xs w-full resize-y"
-            />
-            <textarea
-              value={draft.learning}
-              onChange={(e) =>
-                onUpdateClosing(c.id, { learning: e.currentTarget.value })
-              }
-              placeholder="学び(原因)"
+              placeholder="どうだった？（感想・気づき）"
               className="border border-slate-200 rounded px-2 py-1 text-xs w-full resize-y"
             />
             <div className="flex gap-2 flex-wrap">
@@ -205,6 +238,11 @@ export function Board(props: Props) {
                 {c.learning && <div><strong>学び:</strong> {c.learning}</div>}
               </div>
             ) : null}
+            {c.comment && (
+              <div className="mt-1 text-xs text-slate-500">
+                <strong>コメント:</strong> {c.comment}
+              </div>
+            )}
             <button
               type="button"
               onClick={() => onSetStatus(c.id, "planned")}

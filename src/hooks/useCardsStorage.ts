@@ -22,6 +22,7 @@ function normalizeCards(saved: unknown): CardType[] {
     const success = prop(x, "success");
     const result = prop(x, "result");
     const learning = prop(x, "learning");
+    const comment = prop(x, "comment");
     const createdAt = prop(x, "createdAt");
     const completedAt = prop(x, "completedAt");
 
@@ -33,6 +34,7 @@ function normalizeCards(saved: unknown): CardType[] {
       status,
       result: typeof result === "string" ? result : "",
       learning: typeof learning === "string" ? learning : "",
+      comment: typeof comment === "string" ? comment : "",
       createdAt: typeof createdAt === "string" ? createdAt : new Date().toISOString(),
       completedAt: typeof completedAt === "string" ? completedAt : undefined,
     };
@@ -90,6 +92,7 @@ export function useCardsStorage(storageKey: string) {
       status: "planned",
       result: "",
       learning: "",
+      comment: "",
       createdAt: new Date().toISOString(),
     };
 
