@@ -1,12 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { CardType } from "../types";
 
-export type Experiment = {
-  title: string;
-  hypothesis: string;
-  success: string;
-};
-
 export type QuestionAngle =
   | "causal"
   | "assumption"
@@ -14,14 +8,21 @@ export type QuestionAngle =
   | "reproducibility"
   | "perspective";
 
-export type Question = {
-  text: string;
-  angle: QuestionAngle;
+export type Experiment = {
+  title: string;
+  hypothesis: string;
+  success: string;
 };
 
+// AIが内容に応じて表示形式を選ぶ（コンポーネント選択パターン）
+export type Block =
+  | { type: "question"; angle: QuestionAngle; text: string }
+  | { type: "comparison"; left: string; right: string; note: string }
+  | { type: "checklist"; title: string; items: string[] }
+  | ({ type: "experiment" } & Experiment);
+
 export type AnalyzeResult = {
-  questions: Question[];
-  experiments: Experiment[];
+  blocks: Block[];
 };
 
 export async function analyzeDone(cards: CardType[]): Promise<AnalyzeResult> {
@@ -46,7 +47,7 @@ export async function analyzeDone(cards: CardType[]): Promise<AnalyzeResult> {
 
   const message = await client.messages.create({
     model: "claude-opus-4-8",
-    max_tokens: 1200,
+    max_tokens: 1400,
     messages: [
       {
         role: "user",
@@ -55,32 +56,27 @@ export async function analyzeDone(cards: CardType[]): Promise<AnalyzeResult> {
 ${cardSummaries}
 
 あなたの役割は答えを出すことではなく、私の思考の盲点を突く「壁打ち相手」です。
-私が自分の結果・学びを書く中で見落としていそうな点を、問いの形で返してください。
+内容に応じて最適な"表示ブロック"を選び、blocks配列として返してください。使えるブロックは4種類です。
 
-次の2つを返してください。
+1. question（問い）: 私が見落としていそうな点を問いの形で。2〜3個。各問いは以下の観点(angle)を付ける:
+   - "causal"（因果と相関）/ "assumption"（思い込み）/ "counter"（反証の見落とし）/ "reproducibility"（再現性・運）/ "perspective"（別の視点）
+   選び方: 私が既に書いている点は避け（盲点度）、観点は被らせない（多様性）。"causal"と"counter"だけに偏らせず、他の観点が当てはまるなら積極的に選ぶ。
 
-1. questions: 私が考えていなさそうな問いを「ちょうど2つ」。以下の5観点(angle)から選ぶこと:
-   - "causal": 因果と相関の取り違え（本当にそれが原因か、別の要因では？）
-   - "assumption": 未検証の思い込み（前提として疑っていない点は？）
-   - "counter": 反証の見落とし（うまくいかなかった場合や例外はなかったか？）
-   - "reproducibility": 再現性・運（たまたまではないか、条件を変えても再現するか？）
-   - "perspective": 別の視点・考察（全く違う角度から見るとどう解釈できるか？）
+2. comparison（比較）: 仮説と実際の結果に食い違い（ギャップ）がある時だけ使う。left=仮説の想定、right=実際の結果、note=ギャップの要点。ギャップが無ければ省略。
 
-   2つの選び方は次の基準に従うこと:
-   - 盲点度: 私が書いた結果・学び・コメントで「まだ触れていない」角度を最優先する（既に自分で考えている点は選ばない）。
-   - 多様性: 2つは必ず異なる観点(angle)にし、思考の方向が被らないようにする。
-   - 偏り回避: "causal"と"counter"は当てはめやすく偏りがちなので、両方を同時に選ぶのは避ける。"assumption"（思い込み）・"reproducibility"（再現性）・"perspective"（別視点）が少しでも当てはまるなら、そちらを積極的に選ぶこと。少なくとも1つはこの3観点から選ぶのが望ましい。
-   断定や助言ではなく、私自身が考え直したくなる問いにすること。
+3. checklist（確認リスト）: 次に確かめるべき具体的な確認項目。title=見出し、items=2〜4個の短い確認事項。
 
-2. experiments: 問いを踏まえて次に試す価値のある実験を2〜3個。各実験は新しい仮説検証カードとして使えるよう、具体的なタイトル・仮説・成功条件を持つこと。
+4. experiment（次の実験）: 次に試す価値のある新しい仮説検証。1〜2個。カード化して使うのでtitle/hypothesis/successを具体的に。
+
+内容に本当に合うブロックだけを選ぶこと（無理に全種類使わない）。順序は question → comparison → checklist → experiment を目安に。
 
 必ず以下のJSON形式のみで返してください:
 {
-  "questions": [
-    {"text": "問いの文章", "angle": "causal"}
-  ],
-  "experiments": [
-    {"title": "実験のタイトル", "hypothesis": "〇〇すれば△△になるはず", "success": "具体的・測定可能な成功条件"}
+  "blocks": [
+    {"type": "question", "angle": "causal", "text": "問いの文章"},
+    {"type": "comparison", "left": "仮説の想定", "right": "実際の結果", "note": "ギャップの要点"},
+    {"type": "checklist", "title": "次に確かめること", "items": ["確認1", "確認2"]},
+    {"type": "experiment", "title": "実験タイトル", "hypothesis": "〇〇すれば△△になるはず", "success": "測定可能な成功条件"}
   ]
 }`,
       },

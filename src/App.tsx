@@ -10,50 +10,11 @@ import { useCardsStorage } from "./hooks/useCardsStorage";
 import { useClosing } from "./hooks/useClosing";
 import { useHandoverStorage } from "./hooks/useHandoverStorage";
 import { analyzeDone } from "./utils/analyzeDone";
-import type {
-  AnalyzeResult,
-  Experiment,
-  QuestionAngle,
-} from "./utils/analyzeDone";
-
-const ANGLE_STYLE: Record<
-  QuestionAngle,
-  { label: string; icon: string; border: string; badge: string }
-> = {
-  causal: {
-    label: "因果と相関",
-    icon: "🔗",
-    border: "border-l-amber-400",
-    badge: "bg-amber-50 text-amber-600",
-  },
-  assumption: {
-    label: "思い込み",
-    icon: "💭",
-    border: "border-l-indigo-400",
-    badge: "bg-indigo-50 text-indigo-500",
-  },
-  counter: {
-    label: "反証の見落とし",
-    icon: "⚠️",
-    border: "border-l-rose-400",
-    badge: "bg-rose-50 text-rose-500",
-  },
-  reproducibility: {
-    label: "再現性・運",
-    icon: "🎲",
-    border: "border-l-teal-400",
-    badge: "bg-teal-50 text-teal-600",
-  },
-  perspective: {
-    label: "別の視点",
-    icon: "🔀",
-    border: "border-l-violet-400",
-    badge: "bg-violet-50 text-violet-500",
-  },
-};
+import type { AnalyzeResult, Experiment } from "./utils/analyzeDone";
+import { AnalysisView } from "./features/cards/AnalysisView";
 
 const STORAGE_KEY = "learning_log_cards_v1";
-const ANALYSIS_KEY = "learning_log_analysis_v1";
+const ANALYSIS_KEY = "learning_log_analysis_v2";
 
 type PersistedAnalysis = { analysis: AnalyzeResult | null; added: number[] };
 
@@ -115,11 +76,10 @@ export default function App() {
     deleteCard: deleteHandoverCard,
   } = useHandoverStorage();
 
-  // 完了列には直近24時間の完了のみ表示（ログ一覧には全件残す）
-  const DAY_MS = 24 * 60 * 60 * 1000;
+  // 完了列には「今日」完了したものだけ表示（日付が変わると消える。ログ一覧には全件残る）
+  const today = new Date().toDateString();
   const recentDone = done.filter(
-    (c) =>
-      !c.completedAt || Date.now() - new Date(c.completedAt).getTime() < DAY_MS,
+    (c) => !c.completedAt || new Date(c.completedAt).toDateString() === today,
   );
 
   function onDeleteCard(id: string) {
@@ -252,62 +212,11 @@ export default function App() {
                 <div className="text-xs text-slate-400 mb-2">
                   AI からの問い（自分の考えと突き合わせてみてください）
                 </div>
-                <div className="grid gap-2">
-                  {analysis.questions.map((q, i) => {
-                    const style = ANGLE_STYLE[q.angle];
-                    return (
-                      <div
-                        key={i}
-                        className={`border-l-4 ${style.border} bg-white border border-slate-200 rounded-lg p-3`}
-                      >
-                        <span
-                          className={`inline-flex items-center gap-1 text-[10px] font-medium rounded px-1.5 py-0.5 mb-1.5 ${style.badge}`}
-                        >
-                          {style.icon} {style.label}
-                        </span>
-                        <p className="text-sm text-slate-600 leading-relaxed m-0">
-                          {q.text}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {analysis.experiments.length > 0 && (
-                  <div className="mt-4 grid gap-2">
-                    <div className="text-xs text-slate-400">次に試す実験</div>
-                    {analysis.experiments.map((exp, i) => (
-                      <div
-                        key={i}
-                        className="border border-slate-200 rounded-lg p-3 bg-white"
-                      >
-                        <strong className="text-sm text-slate-800">
-                          {exp.title}
-                        </strong>
-                        <div className="text-xs text-slate-500 mt-1">
-                          <span className="text-indigo-400 font-semibold mr-1.5">
-                            仮説
-                          </span>
-                          {exp.hypothesis}
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          <span className="text-emerald-500 font-semibold mr-1.5">
-                            成功条件
-                          </span>
-                          {exp.success}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleAddExperiment(exp, i)}
-                          disabled={addedExperiments.has(i)}
-                          className="mt-2 text-xs px-2.5 py-1 border border-slate-700 bg-slate-700 text-white rounded hover:bg-slate-800 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-default"
-                        >
-                          {addedExperiments.has(i) ? "追加済み ✓" : "カードにする"}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <AnalysisView
+                  blocks={analysis.blocks}
+                  addedExperiments={addedExperiments}
+                  onAddExperiment={handleAddExperiment}
+                />
               </div>
             )}
 
