@@ -210,7 +210,7 @@ export default function App() {
             {!isAnalyzing && analysis && (
               <div className="mb-4 border border-slate-200 rounded-lg p-4 bg-slate-50/60">
                 <div className="text-xs text-slate-400 mb-2">
-                  AI からの問い（自分の考えと突き合わせてみてください）
+                  AIからの気づき（自分の考えと突き合わせてみてください）
                 </div>
                 <AnalysisView
                   blocks={analysis.blocks}
