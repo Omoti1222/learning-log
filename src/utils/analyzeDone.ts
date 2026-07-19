@@ -87,5 +87,10 @@ ${cardSummaries}
     message.content[0].type === "text" ? message.content[0].text : "";
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error("AIの応答を解析できませんでした");
-  return JSON.parse(match[0]) as AnalyzeResult;
+
+  const parsed = JSON.parse(match[0]) as Partial<AnalyzeResult>;
+  if (!Array.isArray(parsed.blocks)) {
+    throw new Error("AIの応答を解析できませんでした");
+  }
+  return { blocks: parsed.blocks };
 }

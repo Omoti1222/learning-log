@@ -99,11 +99,13 @@ function ChecklistBlock({
     });
   }
 
+  const safeItems = Array.isArray(items) ? items : [];
+
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-3">
       <div className="text-xs font-medium text-slate-500 mb-2">{title}</div>
       <div className="grid gap-1.5">
-        {items.map((item, i) => (
+        {safeItems.map((item, i) => (
           <button
             key={i}
             type="button"
@@ -175,9 +177,10 @@ type Props = {
 };
 
 export function AnalysisView({ blocks, addedExperiments, onAddExperiment }: Props) {
+  const safeBlocks = Array.isArray(blocks) ? blocks : [];
   return (
     <div className="grid gap-2">
-      {blocks.map((b, i) => {
+      {safeBlocks.map((b, i) => {
         switch (b.type) {
           case "question":
             return <QuestionBlock key={i} angle={b.angle} text={b.text} />;
