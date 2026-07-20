@@ -18,14 +18,13 @@ type Props = {
   onUpdateClosing: (id: string, patch: ClosingPatch) => void;
   onCancelClosing: (id: string) => void;
   onConfirmDone: (id: string) => void;
+  onEditTitle: (id: string, title: string) => void;
 };
 
 const btnBase =
   "text-xs px-2.5 py-1 border rounded cursor-pointer transition-colors";
-const btnDefault =
-  `${btnBase} border-slate-200 bg-white text-slate-500 hover:bg-slate-50`;
-const btnPrimary =
-  `${btnBase} border-slate-700 bg-slate-700 text-white hover:bg-slate-800`;
+const btnDefault = `${btnBase} border-slate-200 bg-white text-slate-500 hover:bg-slate-50`;
+const btnPrimary = `${btnBase} border-slate-700 bg-slate-700 text-white hover:bg-slate-800`;
 
 function DoingCard({
   c,
@@ -58,7 +57,10 @@ function DoingCard({
     setGenerateError("");
     try {
       const result = await generateDraft(c.title, c.hypothesis, c.success);
-      onUpdateClosing(c.id, { result: result.result, learning: result.learning });
+      onUpdateClosing(c.id, {
+        result: result.result,
+        learning: result.learning,
+      });
     } catch (e) {
       setGenerateError(e instanceof Error ? e.message : "エラーが発生しました");
     } finally {
@@ -105,7 +107,9 @@ function DoingCard({
                     {isGenerating ? "生成中..." : "AI下書き"}
                   </button>
                   {generateError && (
-                    <span className="text-xs text-red-400">{generateError}</span>
+                    <span className="text-xs text-red-400">
+                      {generateError}
+                    </span>
                   )}
                 </div>
                 <textarea
@@ -169,13 +173,15 @@ export function Board(props: Props) {
     onUpdateClosing,
     onCancelClosing,
     onConfirmDone,
+    onEditTitle,
   } = props;
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
   const total = doing.length + planned.length;
 
   return (
     <div className="grid gap-3 grid-cols-2">
-
       {/* やること列 */}
       <section className="border border-slate-200 rounded-lg p-3 bg-slate-50/60">
         <h2 className="font-semibold text-xs text-slate-500 tracking-wide uppercase mb-3 m-0">
@@ -215,13 +221,54 @@ export function Board(props: Props) {
           ) : (
             planned.map((c) => (
               <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
-                <button
-                  type="button"
-                  onClick={() => onSetStatus(c.id, "doing")}
-                  className={btnDefault}
-                >
-                  進行中へ
-                </button>
+                {editingId === c.id ? (
+                  <div className="grid gap-2 w-full mt-2">
+                    <input
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      className="border border-slate-200 rounded px-2 py-1 text-xs w-full"
+                    />
+                    <div className="flex gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onEditTitle(c.id, editText);
+                          setEditingId(null);
+                        }}
+                        className={btnPrimary}
+                      >
+                        保存
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingId(null)}
+                        className={btnDefault}
+                      >
+                        キャンセル
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-1 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => onSetStatus(c.id, "doing")}
+                      className={btnDefault}
+                    >
+                      進行中へ
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingId(c.id);
+                        setEditText(c.title);
+                      }}
+                      className={btnDefault}
+                    >
+                      編集
+                    </button>
+                  </div>
+                )}
               </Card>
             ))
           )}
@@ -234,8 +281,16 @@ export function Board(props: Props) {
           <Card key={c.id} c={c} onDelete={() => onDeleteCard(c.id)}>
             {c.result || c.learning ? (
               <div className="mt-2 text-xs text-slate-500 grid gap-0.5">
-                {c.result && <div><strong>結果:</strong> {c.result}</div>}
-                {c.learning && <div><strong>学び:</strong> {c.learning}</div>}
+                {c.result && (
+                  <div>
+                    <strong>結果:</strong> {c.result}
+                  </div>
+                )}
+                {c.learning && (
+                  <div>
+                    <strong>学び:</strong> {c.learning}
+                  </div>
+                )}
               </div>
             ) : null}
             {c.comment && (
@@ -253,7 +308,6 @@ export function Board(props: Props) {
           </Card>
         )}
       </Column>
-
     </div>
   );
 }

@@ -59,6 +59,7 @@ export default function App() {
     addCard,
     deleteCard,
     setStatus,
+    editTitle,
   } = useCardsStorage(STORAGE_KEY);
 
   const {
@@ -126,14 +127,12 @@ export default function App() {
 
   const tabBase =
     "px-4 py-1.5 text-sm rounded border cursor-pointer transition-colors";
-  const tabActive =
-    "border-slate-700 text-slate-700 font-semibold bg-white";
+  const tabActive = "border-slate-700 text-slate-700 font-semibold bg-white";
   const tabInactive =
     "border-slate-200 text-slate-400 bg-white hover:bg-slate-50";
 
   return (
     <div className="p-4 max-w-[1000px] mx-auto">
-
       <div className="min-w-0">
         <div className="flex gap-2 mb-4">
           <button
@@ -169,12 +168,15 @@ export default function App() {
               onUpdateClosing={updateClosing}
               onCancelClosing={cancelClosing}
               onConfirmDone={confirmDone}
+              onEditTitle={editTitle}
             />
 
             <hr className="my-4 border-gray-200" />
 
             <div className="flex items-center gap-3 mb-3">
-              <h2 className="font-bold text-base text-gray-700 m-0">ログ一覧</h2>
+              <h2 className="font-bold text-base text-gray-700 m-0">
+                ログ一覧
+              </h2>
               {done.length > 0 && (
                 <>
                   <button
@@ -271,7 +273,6 @@ export default function App() {
           </>
         )}
       </div>
-
     </div>
   );
 }

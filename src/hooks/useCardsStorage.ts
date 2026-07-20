@@ -35,7 +35,8 @@ function normalizeCards(saved: unknown): CardType[] {
       result: typeof result === "string" ? result : "",
       learning: typeof learning === "string" ? learning : "",
       comment: typeof comment === "string" ? comment : "",
-      createdAt: typeof createdAt === "string" ? createdAt : new Date().toISOString(),
+      createdAt:
+        typeof createdAt === "string" ? createdAt : new Date().toISOString(),
       completedAt: typeof completedAt === "string" ? completedAt : undefined,
     };
   });
@@ -108,10 +109,19 @@ export function useCardsStorage(storageKey: string) {
     setCards((prev) =>
       prev.map((c) =>
         c.id === id
-          ? { ...c, status, completedAt: status === "done" ? new Date().toISOString() : c.completedAt }
+          ? {
+              ...c,
+              status,
+              completedAt:
+                status === "done" ? new Date().toISOString() : c.completedAt,
+            }
           : c,
       ),
     );
+  }
+
+  function editTitle(id: string, title: string) {
+    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, title } : c)));
   }
 
   return {
@@ -123,5 +133,6 @@ export function useCardsStorage(storageKey: string) {
     addCard,
     deleteCard,
     setStatus,
+    editTitle,
   };
 }
