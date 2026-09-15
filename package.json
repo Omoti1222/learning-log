@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
+    "@auth/core": "^0.41.1",
+    "@convex-dev/auth": "^0.0.95",
     "@tailwindcss/vite": "^4.2.3",
     "convex": "^1.42.3",
     "react": "^19.2.0",

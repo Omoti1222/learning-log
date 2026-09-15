@@ -92,7 +92,7 @@ export function LogItem({ c, selected, onToggle, onDelete }: Props) {
         className="text-xs px-2 py-0.5 border border-slate-200 text-slate-400 rounded hover:bg-red-50 hover:text-red-400 hover:border-red-200 cursor-pointer shrink-0"
         title="削除"
       >
-        ×
+        🗑️
       </button>
     </li>
   );

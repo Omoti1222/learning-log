@@ -13,6 +13,7 @@ import { analyzeDone } from "./utils/analyzeDone";
 import type { AnalyzeResult, Experiment } from "./utils/analyzeDone";
 import { AnalysisView } from "./features/cards/AnalysisView";
 import { GlobalMemo } from "./components/GlobalMemo";
+import { useAuthActions } from "@convex-dev/auth/react";
 
 // const STORAGE_KEY = "learning_log_cards_v1";
 const ANALYSIS_KEY = "learning_log_analysis_v2";
@@ -77,6 +78,8 @@ export default function App() {
     addCard: addHandoverCard,
     deleteCard: deleteHandoverCard,
   } = useHandoverStorage();
+
+  const { signOut } = useAuthActions();
 
   // 完了列には「今日」完了したものだけ表示（日付が変わると消える。ログ一覧には全件残る）
   const today = new Date().toDateString();
@@ -155,6 +158,13 @@ export default function App() {
             className={`${tabBase} ${tab === "handover" ? tabActive : tabInactive}`}
           >
             業務内容
+          </button>
+          <button
+            type="button"
+            onClick={() => signOut()}
+            className="ml-auto px-4 py-1.5 text-sm rounded border border-slate-200 text-slate-400 hover:bg-slate-50 cursor-pointer"
+          >
+            ログアウト
           </button>
         </div>
 
