@@ -124,9 +124,30 @@ export function useCardsStorage(storageKey: string) {
     setCards((prev) => prev.map((c) => (c.id === id ? { ...c, title } : c)));
   }
 
+  function complete(input: {
+    id: string;
+    result: string;
+    learning: string;
+    comment: string;
+  }) {
+    setCards((prev) =>
+      prev.map((c) =>
+        c.id === input.id
+          ? {
+              ...c,
+              status: "done",
+              result: input.result,
+              learning: input.learning,
+              comment: input.comment,
+              completedAt: new Date().toISOString(),
+            }
+          : c,
+      ),
+    );
+  }
+
   return {
     cards,
-    setCards,
     planned,
     doing,
     done,
@@ -134,5 +155,6 @@ export function useCardsStorage(storageKey: string) {
     deleteCard,
     setStatus,
     editTitle,
+    complete,
   };
 }

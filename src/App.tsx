@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-import { useConvexCards } from "./hooks/useConvexCards";
+import { useCardsStorage } from "./hooks/useCardsStorage";
 import { AddCardForm } from "./features/cards/AddCardForm";
 import { Board } from "./features/cards/Board";
 import { LogItem } from "./features/cards/LogItem";
@@ -13,9 +13,8 @@ import { analyzeDone } from "./utils/analyzeDone";
 import type { AnalyzeResult, Experiment } from "./utils/analyzeDone";
 import { AnalysisView } from "./features/cards/AnalysisView";
 import { GlobalMemo } from "./components/GlobalMemo";
-import { useAuthActions } from "@convex-dev/auth/react";
 
-// const STORAGE_KEY = "learning_log_cards_v1";
+const STORAGE_KEY = "learning_log_cards_v1";
 const ANALYSIS_KEY = "learning_log_analysis_v2";
 
 type PersistedAnalysis = { analysis: AnalyzeResult | null; added: number[] };
@@ -62,7 +61,7 @@ export default function App() {
     setStatus,
     editTitle,
     complete,
-  } = useConvexCards();
+  } = useCardsStorage(STORAGE_KEY);
 
   const {
     closing,
@@ -78,8 +77,6 @@ export default function App() {
     addCard: addHandoverCard,
     deleteCard: deleteHandoverCard,
   } = useHandoverStorage();
-
-  const { signOut } = useAuthActions();
 
   // 完了列には「今日」完了したものだけ表示（日付が変わると消える。ログ一覧には全件残る）
   const today = new Date().toDateString();
@@ -158,13 +155,6 @@ export default function App() {
             className={`${tabBase} ${tab === "handover" ? tabActive : tabInactive}`}
           >
             業務内容
-          </button>
-          <button
-            type="button"
-            onClick={() => signOut()}
-            className="ml-auto px-4 py-1.5 text-sm rounded border border-slate-200 text-slate-400 hover:bg-slate-50 cursor-pointer"
-          >
-            ログアウト
           </button>
         </div>
 
