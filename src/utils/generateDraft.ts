@@ -1,5 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
-
 type Draft = { result: string; learning: string };
 
 export async function generateDraft(
@@ -7,34 +5,16 @@ export async function generateDraft(
   hypothesis: string,
   success: string,
 ): Promise<Draft> {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-  if (!apiKey || apiKey === "your_api_key_here") {
-    throw new Error(".env.local に VITE_ANTHROPIC_API_KEY を設定してください");
-  }
-
-  const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-
-  const message = await client.messages.create({
-    model: "claude-opus-4-8",
-    max_tokens: 400,
-    messages: [
-      {
-        role: "user",
-        content: `仮説検証の振り返りを短く下書きしてください。
-
-タイトル: ${title}
-仮説: ${hypothesis}
-成功条件: ${success}
-
-JSON形式で返してください:
-{"result": "実際の結果（2〜3文）", "learning": "学びや気づき（2〜3文）"}`,
-      },
-    ],
+  const res = await fetch("/api/generate-draft", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, hypothesis, success }),
   });
 
-  const text =
-    message.content[0].type === "text" ? message.content[0].text : "";
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error("AIの応答を解析できませんでした");
-  return JSON.parse(match[0]) as Draft;
+  const body = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error(body?.error ?? "下書きの生成に失敗しました");
+  }
+
+  return body as Draft;
 }
